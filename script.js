@@ -111,8 +111,8 @@
     },
 
     pdf: {
-      vendorScripts: ['assets/vendor/jspdf.umd.min.js', 'assets/vendor/jspdf.plugin.autotable.min.js'],
-      fontScript: 'assets/fonts/pdf-fonts.js',
+      vendorScripts: ['jspdf.umd.min.js', 'jspdf.plugin.autotable.min.js'],
+    fontScript: 'pdf-fonts.js',
       accent: [79, 70, 229],
       accentSoft: [238, 240, 255],
       text: [31, 36, 48],
