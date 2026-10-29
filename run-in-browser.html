@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Тесты калькулятора</title>
+  <style>
+    body { font: 15px/1.5 system-ui, sans-serif; margin: 24px; color: #1f2430; }
+    h1 { font-size: 22px; }
+    table { border-collapse: collapse; width: 100%; max-width: 1000px; }
+    th, td { text-align: left; padding: 6px 10px; border-bottom: 1px solid #e3e6ee; }
+    td.num { text-align: right; white-space: nowrap; }
+    .ok { color: #157347; font-weight: 600; } .fail { color: #b42318; font-weight: 600; }
+    #summary { font-size: 18px; font-weight: 600; margin: 12px 0 20px; }
+  </style>
+</head>
+<body>
+  <h1>Приёмочные тесты расчёта</h1>
+  <p>Откройте этот файл в браузере — тесты выполняются на той же функции <code>calculate()</code>, что и интерфейс.</p>
+  <p id="summary"></p>
+  <table>
+    <thead><tr><th>ID</th><th>Сценарий</th><th>Стоимость (ожид. / факт)</th><th>Срок (ожид. / факт)</th><th>Результат</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+  <script src="../script.js"></script>
+  <script src="test-cases.js"></script>
+  <script>
+    (function () {
+      var calc = window.WebsiteCalculator, data = window.CALC_TEST_CASES;
+      var tbody = document.getElementById('rows'), pass = 0, fail = 0;
+      function td(text, cls) { var c = document.createElement('td'); c.textContent = text; if (cls) c.className = cls; return c; }
+      data.acceptance.concat(data.extra).forEach(function (tc) {
+        var r = calc.calculate(tc.params);
+        var ok = r.totalPrice === tc.price && r.totalDuration === tc.days;
+        try { calc.verifyResult(r); } catch (e) { ok = false; }
+        ok ? pass++ : fail++;
+        var tr = document.createElement('tr');
+        tr.append(td(tc.id), td(tc.title),
+          td(calc.formatMoney(tc.price) + ' / ' + calc.formatMoney(r.totalPrice), 'num'),
+          td(tc.days + ' / ' + r.totalDuration, 'num'),
+          td(ok ? 'PASS' : 'FAIL', ok ? 'ok' : 'fail'));
+        tbody.append(tr);
+      });
+      data.pagesInput.forEach(function (c) {
+        var res = calc.normalizePages(c.raw, c.fallback);
+        var ok = res.value === c.value && res.corrected === c.corrected;
+        ok ? pass++ : fail++;
+        var tr = document.createElement('tr');
+        tr.append(td('IN'), td('Ввод страниц «' + c.raw + '»'), td('—', 'num'), td(c.value + ' / ' + res.value, 'num'), td(ok ? 'PASS' : 'FAIL', ok ? 'ok' : 'fail'));
+        tbody.append(tr);
+      });
+      var s = document.getElementById('summary');
+      s.textContent = 'Пройдено: ' + pass + ', не пройдено: ' + fail;
+      s.className = fail ? 'fail' : 'ok';
+      document.body.setAttribute('data-done', fail ? 'fail' : 'pass');
+    })();
+  </script>
+</body>
+</html>
